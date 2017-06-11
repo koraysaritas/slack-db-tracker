@@ -1,0 +1,64 @@
+app:
+  version: '0.0.1'
+  hostname: '<YOUR-HOSTNAME>'
+  supported-databases: ['altibase', 'timesten', 'voltdb']
+slack:
+  token: '<YOUR-SLACK-TOKEN>'
+  webhook-url: '<YOUR-WEBHOOK-URL>'
+  send-help-msg: true
+  bot-name: '<YOUR-BOT-NAME>'
+  channel-name: '<YOUR-CHANNEL-NAME>'
+  mention-format: '<@{member_id}>'
+  bot-command-start-format: '!{bot_name}'
+  bot-command-format: '!{hostname}-{command}'
+  commands: ['altibase', 'timesten', 'voltdb']
+  seconds-sleep-after-slack-poll: 2
+altibase:
+  active: false
+  bin-dir: ''
+  bin-isql: ''
+  bin-status: ''
+  conn-str: ''
+  pipe_status_check: ['{bin_dir}{bin_status} {conn_str}']
+  pipe_status_check: ['', '']
+  seconds-sleep-after-status-check: 5
+  seconds-error-msg-flood-protection: 300
+  parser: {
+    isql: {
+      'ClusterState': ['', ''],
+      'StartTime': ['', ''],
+      'Uptime': ['', '']
+    }
+  }
+timesten:
+  active: false
+  bin-dir: '/home/timesten/TimesTen/tt1122/bin/'
+  bin-isql: 'isql'
+  bin-status: 'ttstatus'
+  conn-str: '-connStr "DSN=TT_1122;"'
+  pipe_status_check: ['{bin_dir}{bin_status} {conn_str}']
+  seconds-sleep-after-status-check: 5
+  seconds-error-msg-flood-protection: 300
+  parser: {
+    isql: {
+      'ClusterState': ['', ''],
+      'StartTime': ['', ''],
+      'Uptime': ['', '']
+    }
+  }
+voltdb:
+  active: true
+  bin-dir: '/home/voltdb/voltdb-ent-7.0/bin/'
+  bin-isql: 'sqlcmd'
+  bin-status: ''
+  conn-str: ''
+  pipe_status_check: ['echo "exec @SystemInformation OVERVIEW;"', '{bin_dir}{bin_isql}']
+  seconds-sleep-after-status-check: 5
+  seconds-error-msg-flood-protection: 300
+  parser: {
+    isql: {
+      'ClusterState': ['Cluster State', '.*CLUSTERSTATE\s+(\w+)\s{2,}'],
+      'StartTime': ['Start Time', '.*STARTTIME\s+(.*)\s{2,}'],
+      'Uptime': ['Uptime', '.*UPTIME\s+(.*)\s{2,}']
+    }
+  }
