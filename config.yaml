@@ -1,20 +1,23 @@
 app:
   version: '0.0.1'
-  hostname: '<YOUR-HOSTNAME>'
+  hostname: 'omsdev'
   supported-databases: ['altibase', 'timesten', 'voltdb']
 slack:
-  token: '<YOUR-SLACK-TOKEN>'
-  webhook-url: '<YOUR-WEBHOOK-URL>'
+  is-active: true
   send-help-msg: true
-  bot-name: '<YOUR-BOT-NAME>'
-  channel-name: '<YOUR-CHANNEL-NAME>'
-  mention-format: '<@{member_id}>'
-  bot-command-start-format: '!{bot_name}'
-  bot-command-format: '!{hostname}-{command}'
-  commands: ['altibase', 'timesten', 'voltdb']
+  token: '<SLACK-TOKEN-HERE>' # xoxb-15....
+  webhook-url: '<SLACK-WEBHOOK-URL-HERE>' # https://hooks.slack.com/services/T32...
+  bot-name: '<SLACK-BOT-NAME-HERE>' # bob
+  channel-name: '<SLACK-CHANNEL-HERE>' # general
+  commands: {
+    # command: worker
+    altibase: 'altibase',
+    timesten-status: 'timesten',
+    voltdb-status: 'voltdb'
+  }
   seconds-sleep-after-slack-poll: 2
 altibase:
-  active: false
+  is-active: true
   bin-dir: ''
   bin-isql: ''
   bin-status: ''
@@ -31,8 +34,8 @@ altibase:
     }
   }
 timesten:
-  active: false
-  bin-dir: '/home/timesten/TimesTen/tt1122/bin/'
+  is-active: true
+  bin-dir: '~/timesten/TimesTen/tt1122/bin/'
   bin-isql: 'isql'
   bin-status: 'ttstatus'
   conn-str: '-connStr "DSN=TT_1122;"'
@@ -47,8 +50,8 @@ timesten:
     }
   }
 voltdb:
-  active: true
-  bin-dir: '/home/voltdb/voltdb-ent-7.0/bin/'
+  is-active: true
+  bin-dir: '~/voltdb/voltdb-ent-7.0/bin/'
   bin-isql: 'sqlcmd'
   bin-status: ''
   conn-str: ''

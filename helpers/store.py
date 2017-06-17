@@ -8,6 +8,8 @@ class Store:
 class WorkerStore(Store):
     def __init__(self, config, worker_name):
         Store.__init__(self, config)
+        self.is_active = config[worker_name]["bin-dir"]
+        self.worker_name = worker_name
         self.bin_dir = config[worker_name]["bin-dir"]
         self.bin_isql = config[worker_name]["bin-isql"]
         self.bin_status = config[worker_name]["bin-status"]
@@ -31,12 +33,16 @@ class SlackStore(Store):
         self.slack_client = None
         self.slack_token = config["slack"]["token"]
         self.slack_url_webhook = config["slack"]["webhook-url"]
+        self.request_header = {'Content-Type': 'application/json'}
         self.slack_channel_name = config["slack"]["channel-name"]
         self.slack_send_help_msg = config["slack"]["send-help-msg"]
         self.slack_bot_name = config["slack"]["bot-name"]
+        self.mention_format = "<@{member_id}>"
         self.slack_mention_bot = None
-        self.mention_format = config["slack"]["mention-format"]
-        self.format_bot_cmd_start = config["slack"]["bot-command-start-format"]
-        self.format_bot_cmd = config["slack"]["bot-command-format"]
-        self.arr_commands = config["slack"]["commands"]
-        self.seconds_sleep_after_slack_poll = config["slack"]["seconds-sleep-after-slack-poll"]
+        self.format_bot_cmd_start = "!{bot_name}"
+        self.bot_cmd_start = self.format_bot_cmd_start.format(bot_name=self.slack_bot_name)
+        self.format_bot_cmd = "!{bot_name} {hostname_and_command}"
+        self.dict_commands = {"-".join([self.hostname, command]): worker_name
+                              for command, worker_name in dict(config["slack"]["commands"]).items()}
+        self.dict_commands_raw = config["slack"]["commands"]
+        self.seconds_sleep_after_slack_poll = int(config["slack"]["seconds-sleep-after-slack-poll"])

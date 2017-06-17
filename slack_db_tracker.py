@@ -1,10 +1,12 @@
 import multiprocessing
+
+import click
+
 from helpers import config_helper
-from helpers import utils
-from workers import slack_worker
-from workers import voltdb_worker
-from workers import timesten_worker
 from workers import altibase_worker
+from workers import slack_worker
+from workers import timesten_worker
+from workers import voltdb_worker
 
 
 def start_worker(workers, worker_name, worker_func, worker_args):
@@ -17,8 +19,13 @@ def start_worker(workers, worker_name, worker_func, worker_args):
     return worker
 
 
-def main():
-    config = config_helper.get_config(debug=True)
+@click.command()
+@click.option('-d', '--debug', is_flag=True, default=False)
+@click.option('-v', '--verbose', is_flag=True, default=False)
+def main(debug, verbose):
+    click.echo('Debug: %s' % debug)
+    click.echo('Verbosity: %s' % verbose)
+    config = config_helper.get_config(debug=debug)
 
     workers = []
 
