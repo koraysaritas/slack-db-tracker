@@ -43,6 +43,7 @@ def run(config, worker_name):
                 print(msg)
                 if worker_store.has_error:
                     slack_helper.send_message(slack_store, msg, worker_name)
+                    worker_store.time_last_notification = None
                 worker_store.has_error = False
                 worker_store.time_last_error = None
                 worker_store.last_error = None

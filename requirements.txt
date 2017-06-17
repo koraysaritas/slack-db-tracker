@@ -1,6 +1,16 @@
 click==6.7
+dateparser==0.6.0
+humanize==0.5.1
+maya==0.3.2
+pendulum==1.2.2
+python-dateutil==2.6.0
+pytz==2017.2
+pytzdata==2017.2
 PyYAML==3.12
+regex==2017.6.7
 requests==2.14.2
+ruamel.yaml==0.15.9
 six==1.10.0
 slackclient==1.0.5
+tzlocal==1.4
 websocket-client==0.40.0

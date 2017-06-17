@@ -18,10 +18,10 @@ slack:
   seconds-sleep-after-slack-poll: 2
 altibase:
   is-active: true
-  bin-dir: ''
-  bin-isql: ''
+  bin-dir: '/home/altibase/ALTIBASE_COMMUNITY_EDITION_SERVER/bin/'
+  bin-isql: 'isql'
   bin-status: ''
-  conn-str: ''
+  conn-str: '-s <SERVER-NAME> -u <USER-NAME> -p <PASSWORD>'
   seconds-sleep-after-status-check: 5
   seconds-error-msg-flood-protection: 300
   parser: {

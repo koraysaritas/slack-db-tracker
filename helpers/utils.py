@@ -1,4 +1,5 @@
 import datetime
+import maya
 
 
 def time_to_str(a_time):
@@ -7,6 +8,15 @@ def time_to_str(a_time):
 
 def from_timestamp_to_datetime(s):
     return datetime.datetime.fromtimestamp(int(s) / 1000)
+
+
+def from_epoch_to_datetime(s):
+    return datetime.datetime.fromtimestamp(int(s), datetime.timezone.utc)
+
+
+def seconds_ago_to_slang(seconds):
+    now = maya.now()
+    return now.add(seconds=(seconds * -1)).slang_time()
 
 
 def format_error_message(worker_name, time_last_error, last_error):

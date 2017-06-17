@@ -107,6 +107,8 @@ def handle_command(slack_store, worker_store, userid, command, channel_name):
         helper_func = voltdb_helper.get_voltdb_status
     elif cmd_parsed == "timesten-status":
         helper_func = timesten_helper.get_timesten_status
+    elif cmd_parsed == "altibase-status":
+        helper_func = altibase_helper.get_altibase_status
     if helper_func:
         do(helper_func, slack_store, worker_store, userid, command, channel_name)
 
