@@ -7,6 +7,8 @@ from helpers import config_helper
 from helpers import slack_helper
 from helpers import utils
 from helpers import voltdb_helper
+from helpers import timesten_helper
+from helpers import altibase_helper
 from helpers.store import SlackStore
 from helpers.store import WorkerStore
 
@@ -99,12 +101,18 @@ def should_handle_command(slack_store, dict_workers, userid, channel_name, maybe
 
 def handle_command(slack_store, worker_store, userid, command, channel_name):
     cmd_parsed = utils.command_without_hostname(slack_store.hostname, command)
+
+    helper_func = None
     if cmd_parsed == "voltdb-status":
-        do_voltdb_status(slack_store, worker_store, userid, command, channel_name)
+        helper_func = voltdb_helper.get_voltdb_status
+    elif cmd_parsed == "timesten-status":
+        helper_func = timesten_helper.get_timesten_status
+    if helper_func:
+        do(helper_func, slack_store, worker_store, userid, command, channel_name)
 
 
-def do_voltdb_status(slack_store, worker_store, userid, command, channel_name):
-    error, result = voltdb_helper.get_voltdb_overview(worker_store)
+def do(helper_func, slack_store, worker_store, userid, command, channel_name):
+    error, result = helper_func(worker_store)
     if error:
         msg = utils.format_error_message(worker_store.worker_name,
                                          datetime.datetime.now(),

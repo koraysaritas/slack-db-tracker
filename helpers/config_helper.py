@@ -30,5 +30,5 @@ def get_config(debug=False):
         sys.exit(1)
 
 
-def get_isql_path(bin_dir, bin_isql):
-    return os.path.join(bin_dir, bin_isql)
+def path_join(*args):
+    return os.path.join(*args)

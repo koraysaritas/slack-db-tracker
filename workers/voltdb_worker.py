@@ -9,6 +9,12 @@ from helpers import voltdb_helper
 from helpers.store import SlackStore
 from helpers.store import WorkerStore
 
+# export PATH=$PATH:$HOME/voltdb/voltdb-ent-7.0/bin
+# sudo bash -c "echo never > /sys/kernel/mm/transparent_hugepage/enabled"
+# sudo bash -c "echo never > /sys/kernel/mm/transparent_hugepage/defrag"
+# sudo /home/volt/voltdb/voltdb-ent-7.0/bin/voltdb init
+# sudo /home/volt/voltdb/voltdb-ent-7.0/bin/voltdb start
+# sudo /home/volt/voltdb/voltdb-ent-7.0/bin/voltdb stop
 
 def run(config, worker_name):
     slack_store = SlackStore(config)
@@ -19,7 +25,7 @@ def run(config, worker_name):
 
     while True:
         try:
-            error, result = voltdb_helper.get_voltdb_overview(worker_store)
+            error, result = voltdb_helper.get_voltdb_status(worker_store)
             if error:
                 if not worker_store.time_last_error:
                     worker_store.time_last_error = datetime.datetime.now()

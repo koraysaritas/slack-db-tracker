@@ -14,7 +14,6 @@ class WorkerStore(Store):
         self.bin_isql = config[worker_name]["bin-isql"]
         self.bin_status = config[worker_name]["bin-status"]
         self.conn_str = config[worker_name]["conn-str"]
-        self.arr_pipe_status_check = config[worker_name]["pipe_status_check"]
         self.seconds_sleep_after_status_check = config[worker_name]["seconds-sleep-after-status-check"]
         self.seconds_error_msg_flood_protection = config[worker_name]["seconds-error-msg-flood-protection"]
         self.dict_parser_isql = config[worker_name]["parser"]["isql"]

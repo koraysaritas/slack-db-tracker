@@ -22,11 +22,11 @@ def process_error(slack_store, worker_store):
         print(ex)
 
 
-def get_voltdb_overview(worker_store):
+def get_voltdb_status(worker_store):
     try:
         c1 = 'echo "exec @SystemInformation OVERVIEW;"'
         # c2 = 'sqlcmd' # requires: export PATH=$PATH:$HOME/voltdb/voltdb-ent-7.0/bin
-        c2 = config_helper.get_isql_path(worker_store.bin_dir, worker_store.bin_isql)
+        c2 = config_helper.path_join(worker_store.bin_dir, worker_store.bin_isql)
         print(" | ".join([c1, c2]))
 
         p1 = subprocess.Popen(c1, shell=True, stdout=subprocess.PIPE)
@@ -54,6 +54,6 @@ def get_voltdb_overview(worker_store):
                             result.append(msg)
             return False, result
     except Exception as e:
-        ex = "Exception: {} @get_voltdb_overview: {}".format(worker_store.worker_name, e)
+        ex = "Exception: {} @get_voltdb_status: {}".format(worker_store.worker_name, e)
         print(ex)
         return True, ex
