@@ -72,7 +72,7 @@ Make some or all of the following settings depending on your setup:
 ![01](https://github.com/koraysaritas/slack-db-tracker/blob/master/screenshots/01_small.png)
 
 ###### Commands-2
-![03](https://github.com/koraysaritas/slack-db-tracker/blob/master/screenshots/03_small.png)
+![03](https://github.com/koraysaritas/slack-db-tracker/blob/master/screenshots/03_small.PNG)
 
-###### Push notifications
-![02](https://github.com/koraysaritas/slack-db-tracker/blob/master/screenshots/02_small.png)
+###### Notifications
+![02](https://github.com/koraysaritas/slack-db-tracker/blob/master/screenshots/02_small.PNG)
