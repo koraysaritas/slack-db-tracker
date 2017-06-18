@@ -51,7 +51,7 @@ voltdb:
   bin-dir: '<VOLTDB-BIN-DIR-HERE>' # ~/voltdb/voltdb-ent-7.0/bin/
   bin-isql: 'sqlcmd'
   bin-status: ''
-  conn-str: ''
+  conn-str: '<VOLTDB-CONNSTR-HERE>' # --servers=odin --user=thor --password=loki.sucks
   seconds-sleep-after-status-check: 5
   seconds-error-msg-flood-protection: 300
   parser: {
