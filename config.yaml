@@ -1,6 +1,6 @@
 app:
-  version: '0.0.1'
-  hostname: 'omsdev'
+  version: '1.0.0'
+  hostname: '<HOSTNAME-HERE>'
   supported-databases: ['altibase', 'timesten', 'voltdb']
 slack:
   is-active: true
@@ -18,10 +18,10 @@ slack:
   seconds-sleep-after-slack-poll: 2
 altibase:
   is-active: true
-  bin-dir: '/home/altibase/ALTIBASE_COMMUNITY_EDITION_SERVER/bin/'
+  bin-dir: '<ALTIBASE-BIN-DIR-HERE>' # /home/altibase/ALTIBASE_COMMUNITY_EDITION_SERVER/bin/
   bin-isql: 'isql'
   bin-status: ''
-  conn-str: '-s <SERVER-NAME> -u <USER-NAME> -p <PASSWORD>'
+  conn-str: '-s <SERVER-NAME-HERE> -u <USER-NAME-HERE> -p <PASSWORD-HERE>'
   seconds-sleep-after-status-check: 5
   seconds-error-msg-flood-protection: 300
   parser: {
@@ -33,10 +33,10 @@ altibase:
   }
 timesten:
   is-active: false
-  bin-dir: '~/TimesTen/tt1122/bin/'
+  bin-dir: '<TIMESTEN-BIN-DIR-HERE>' # ~/TimesTen/tt1122/bin/
   bin-isql: 'isql'
   bin-status: 'ttstatus'
-  conn-str: '-connStr "DSN=TT_1122;"'
+  conn-str: '-connStr <TIMESTEN-CONNSTR-HERE>' # "DSN=TT_1122;"
   seconds-sleep-after-status-check: 5
   seconds-error-msg-flood-protection: 300
   parser: {
@@ -48,7 +48,7 @@ timesten:
   }
 voltdb:
   is-active: false
-  bin-dir: '~/voltdb/voltdb-ent-7.0/bin/'
+  bin-dir: '<VOLTDB-BIN-DIR-HERE>' # ~/voltdb/voltdb-ent-7.0/bin/
   bin-isql: 'sqlcmd'
   bin-status: ''
   conn-str: ''
