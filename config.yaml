@@ -1,7 +1,7 @@
 app:
   version: '1.0.0'
-  hostname: '<HOSTNAME-HERE>'
-  supported-databases: ['altibase', 'timesten', 'voltdb']
+  hostname: '<HOSTNAME-HERE>' # omsdev
+  supported-databases: ['altibase', 'timesten', 'voltdb'] # you can delete unused items
 slack:
   is-active: true
   send-help-msg: true
@@ -21,7 +21,7 @@ altibase:
   bin-dir: '<ALTIBASE-BIN-DIR-HERE>' # /home/altibase/ALTIBASE_COMMUNITY_EDITION_SERVER/bin/
   bin-isql: 'isql'
   bin-status: ''
-  conn-str: '-s <SERVER-NAME-HERE> -u <USER-NAME-HERE> -p <PASSWORD-HERE>'
+  conn-str: '-s <SERVER-NAME-HERE> -u <USER-NAME-HERE> -p <PASSWORD-HERE>' # -s 127.0.0.1 -u hodor -p hodor
   seconds-sleep-after-status-check: 5
   seconds-error-msg-flood-protection: 300
   parser: {
