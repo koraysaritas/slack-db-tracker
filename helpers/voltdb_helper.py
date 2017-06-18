@@ -10,7 +10,9 @@ def get_voltdb_status(worker_store):
         c1 = 'echo "exec @SystemInformation OVERVIEW;"'
         # c2 = 'sqlcmd' # requires: export PATH=$PATH:$HOME/voltdb/voltdb-ent-7.0/bin
         c2 = config_helper.path_join(worker_store.bin_dir, worker_store.bin_isql)
-        print(" | ".join([c1, c2]))
+        if worker_store.verbose:
+            print("")
+            print(" | ".join([c1, c2]))
 
         p1 = subprocess.Popen(c1, shell=True, stdout=subprocess.PIPE)
         p2 = subprocess.Popen(c2, stdin=p1.stdout, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

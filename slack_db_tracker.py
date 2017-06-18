@@ -3,19 +3,16 @@ import multiprocessing
 import click
 
 from helpers import config_helper
-from workers import altibase_worker
+from workers import db_worker
 from workers import slack_worker
-from workers import timesten_worker
-from workers import voltdb_worker
 
 
-def start_worker(workers, worker_name, worker_func, worker_args):
+def create_worker(workers, worker_name, worker_func, worker_args):
     worker = multiprocessing.Process(
         name=worker_name,
         target=worker_func,
         args=worker_args)
     workers.append(worker)
-    worker.start()
     return worker
 
 
@@ -29,23 +26,24 @@ def main(debug, verbose):
 
     workers = []
 
-    start_worker(workers, "slack_worker.run", slack_worker.run, (config, "slack"))
+    create_worker(workers, "slack_worker", slack_worker.run, (config, "slack", verbose))
 
     if config_helper.is_worker_active(config, "voltdb"):
-        print('Starting worker for VoltDB.')
-        start_worker(workers, "voltdb_worker.run", voltdb_worker.run, (config, "voltdb"))
+        create_worker(workers, "voltdb_worker", db_worker.run, (config, "voltdb", verbose))
 
     if config_helper.is_worker_active(config, "timesten"):
-        print('Starting worker for TimesTen.')
-        start_worker(workers, "timesten", timesten_worker.run, (config, "timesten"))
+        create_worker(workers, "timesten_worker", db_worker.run, (config, "timesten", verbose))
 
     if config_helper.is_worker_active(config, "altibase"):
-        print('Starting worker for Altibase.')
-        start_worker(workers, "altibase_worker.run", altibase_worker.run, (config, "altibase"))
+        create_worker(workers, "altibase_worker", db_worker.run, (config, "altibase", verbose))
+
+    for w in workers:
+        print('Starting worker for {}.'.format(w.name))
+        w.start()
 
     for w in workers:
         w.join()
-        print("worker={worker_name} exitcode={worker_exit_code}".format(
+        print("Worker={worker_name} ExitCode={worker_exit_code}".format(
             worker_name=w.name,
             worker_exit_code=w.exitcode))
 

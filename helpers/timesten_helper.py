@@ -11,7 +11,8 @@ def get_timesten_status(worker_store):
             bin_status_path=config_helper.path_join(worker_store.bin_dir, worker_store.bin_status),
             conn_str=worker_store.conn_str
         )
-        print(exec_str)
+        if worker_store.verbose:
+            print("\n" + exec_str)
 
         c1 = exec_str
         p1 = subprocess.Popen(c1, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

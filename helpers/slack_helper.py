@@ -20,7 +20,8 @@ def send_message(slack_store, message, worker_name):
     header = slack_store.request_header
     payload = json.dumps({'text': message})
 
-    print('Request to slack from {}.\nMessage: {}'.format(worker_name, message))
+    if slack_store.verbose:
+        print('\nRequest to slack from {}.\nMessage: {}'.format(worker_name, message))
 
     response = requests.post(
         slack_store.slack_url_webhook, data=payload,
@@ -28,7 +29,7 @@ def send_message(slack_store, message, worker_name):
     )
 
     if response.status_code != 200:
-        print('Request to slack from {} has an error {}.\nResponse: {}\nMessage: {}\n'.format(
+        print('\nRequest to slack from {} has an error {}.\nResponse: {}\nMessage: {}\n'.format(
             worker_name, response.status_code, response.text, message))
 
 
@@ -74,7 +75,8 @@ def join_channel(slack_store, slack_channel_name):
                     slack_store.slack_mention_bot = slack_store.mention_format.format(member_id=id)
                 slack_store.dict_slack_userid_username[id] = name
                 slack_store.dict_slack_username_userid[name] = id
-            print(slack_store.dict_slack_userid_username)
+            if slack_store.verbose:
+                print(slack_store.dict_slack_userid_username)
         else:
             raise Exception("Channel ID not found: {}.".format(slack_channel_name))
     except Exception as e:
@@ -103,17 +105,18 @@ def process_error(slack_store, worker_store, error_result):
             worker_store.time_last_error = datetime.datetime.now()
         worker_store.last_error = "\n".join(error_result) if isinstance(error_result, list) else error_result
         worker_store.has_error = True
-        print(format_error_message(worker_store.worker_name,
-                                   worker_store.time_last_error,
-                                   worker_store.last_error))
+        err_msg = format_error_message(worker_store.worker_name,
+                                       worker_store.time_last_error,
+                                       worker_store.last_error)
+        if worker_store.verbose:
+            print("\n" + err_msg)
 
         seconds_since_last_notification = utils.seconds_since_last_notification(worker_store)
-        print("seconds_since_last_notification: " + str(seconds_since_last_notification))
+        if worker_store.verbose:
+            print("seconds_since_last_notification: " + str(seconds_since_last_notification))
 
         if utils.should_send_error_message(worker_store):
-            err = format_error_message(worker_store.worker_name, worker_store.time_last_error,
-                                       worker_store.last_error)
-            send_message(slack_store, err, worker_store.worker_name)
+            send_message(slack_store, err_msg, worker_store.worker_name)
             worker_store.time_last_notification = datetime.datetime.now()
     except Exception as e:
         ex = "Exception: {} @process_error: {}".format(worker_store.worker_name, e)

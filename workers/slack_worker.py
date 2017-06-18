@@ -13,8 +13,9 @@ from helpers.store import SlackStore
 from helpers.store import WorkerStore
 
 
-def run(config, worker_name):
+def run(config, worker_name, verbose):
     slack_store = SlackStore(config)
+    slack_store.verbose = verbose
 
     maybe_workers = config_helper.get_supported_databases(config)
     dict_workers = {worker_name: WorkerStore(config, worker_name)
@@ -34,7 +35,8 @@ def run(config, worker_name):
                         userid, channel_name, maybe_command = parse_slack_output(slack_store,
                                                                                  slack_store.slack_client.rtm_read())
                         if channel_name and userid:
-                            print("Channel: {}, Maybe Command: {}".format(channel_name, maybe_command))
+                            if slack_store.verbose:
+                                print("Channel: {}, Maybe Command: {}".format(channel_name, maybe_command))
                             yes_handle, worker_store = should_handle_command(slack_store, dict_workers, userid,
                                                                              channel_name, maybe_command)
                             if yes_handle:
@@ -61,7 +63,8 @@ def parse_slack_output(slack_store, slack_rtm_output):
     if output_list and len(output_list) > 0:
         for output in output_list:
             if output and 'text' in output:
-                print("text: " + output['text'])
+                if slack_store.verbose:
+                    print("text: " + output['text'])
                 # return text after the @ mention, whitespace removed
                 as_mention = ""
                 has_bot = slack_store.slack_mention_bot in output['text']
@@ -119,12 +122,14 @@ def do(helper_func, slack_store, worker_store, userid, command, channel_name):
         msg = slack_helper.format_error_message(worker_store.worker_name,
                                                 datetime.datetime.now(),
                                                 result)
-        print(msg)
+        if slack_store.verbose:
+            print(msg)
         slack_helper.send_message(slack_store, msg, worker_store.worker_name)
     else:
-        print("")
         msg = ""
         for m in result:
             msg += m + "\n"
-        print(msg)
+
+        if slack_store.verbose:
+            print("\n" + msg)
         slack_helper.send_message(slack_store, msg, worker_store.worker_name)

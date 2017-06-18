@@ -3,6 +3,7 @@ class Store:
         self.version = config["app"]["version"]
         self.hostname = config["app"]["hostname"]
         self.arr_supported_databases = config["app"]["hostname"]
+        self.verbose = False
 
 
 class WorkerStore(Store):
