@@ -66,10 +66,17 @@ Make some or all of the following settings depending on your setup:
 - ``conn-str: '<VOLTDB-CONNSTR-HERE>'``
   - Example: ``conn-str: '--servers=odin --user=thor --password=loki.sucks'``
 
-###### Screenshots
+## Screenshots
 
-![01](https://github.com/koraysaritas/slack-db-tracker/blob/master/screenshots/01.png)
+###### Commands
 
-![02](https://github.com/koraysaritas/slack-db-tracker/blob/master/screenshots/02.png)
+<img src="https://github.com/koraysaritas/slack-db-tracker/blob/master/screenshots/01.png" align="left" width="529" height="473"/>
 
-![03](https://github.com/koraysaritas/slack-db-tracker/blob/master/screenshots/03.png)
+##
+
+<img src="https://github.com/koraysaritas/slack-db-tracker/blob/master/screenshots/03.png" align="left" width="413" height="211"/>
+
+###### Push notifications
+##
+
+<img src="https://github.com/koraysaritas/slack-db-tracker/blob/master/screenshots/02.png" align="left" width="505" height="155"/>
