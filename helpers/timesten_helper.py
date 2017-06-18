@@ -1,25 +1,7 @@
-import datetime
 import re
 import subprocess
 
-from helpers import slack_helper
-from helpers import utils
 from helpers import config_helper
-
-
-def process_error(slack_store, worker_store):
-    try:
-        seconds_since_last_notification = utils.seconds_since_last_notification(worker_store)
-        print("seconds_since_last_notification: " + str(seconds_since_last_notification))
-
-        if utils.should_send_error_message(worker_store):
-            err = utils.format_error_message(worker_store.worker_name, worker_store.time_last_error,
-                                             worker_store.last_error)
-            slack_helper.send_message(slack_store, err, worker_store.worker_name)
-            worker_store.time_last_notification = datetime.datetime.now()
-    except Exception as e:
-        ex = "Exception: {} @process_error: {}".format(worker_store.worker_name, e)
-        print(ex)
 
 
 def get_timesten_status(worker_store):

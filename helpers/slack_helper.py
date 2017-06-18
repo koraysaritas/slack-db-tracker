@@ -4,6 +4,7 @@ import re
 import json
 import requests
 from slackclient import SlackClient
+from . import utils
 
 
 def send_message_to_user(slack_store, message, worker_name, userid):
@@ -88,3 +89,32 @@ def get_avail_command_str(slack_store):
         c += format_bot_cmd.format(bot_name=slack_store.slack_bot_name,
                                    hostname_and_command=command) + "\n"
     return c
+
+
+def format_error_message(worker_name, time_last_error, last_error):
+    header = "{worker_name}@{time}".format(worker_name=worker_name,
+                                           time=utils.time_to_str(time_last_error))
+    return "\n".join([header, last_error])
+
+
+def process_error(slack_store, worker_store, error_result):
+    try:
+        if not worker_store.time_last_error:
+            worker_store.time_last_error = datetime.datetime.now()
+        worker_store.last_error = "\n".join(error_result) if isinstance(error_result, list) else error_result
+        worker_store.has_error = True
+        print(format_error_message(worker_store.worker_name,
+                                   worker_store.time_last_error,
+                                   worker_store.last_error))
+
+        seconds_since_last_notification = utils.seconds_since_last_notification(worker_store)
+        print("seconds_since_last_notification: " + str(seconds_since_last_notification))
+
+        if utils.should_send_error_message(worker_store):
+            err = format_error_message(worker_store.worker_name, worker_store.time_last_error,
+                                       worker_store.last_error)
+            send_message(slack_store, err, worker_store.worker_name)
+            worker_store.time_last_notification = datetime.datetime.now()
+    except Exception as e:
+        ex = "Exception: {} @process_error: {}".format(worker_store.worker_name, e)
+        print(ex)

@@ -1,13 +1,12 @@
-import datetime
 import time
 
 from slackclient import SlackClient
 
 from helpers import slack_helper
-from helpers import utils
 from helpers import voltdb_helper
 from helpers.store import SlackStore
 from helpers.store import WorkerStore
+
 
 # export PATH=$PATH:$HOME/voltdb/voltdb-ent-7.0/bin
 # sudo bash -c "echo never > /sys/kernel/mm/transparent_hugepage/enabled"
@@ -27,14 +26,7 @@ def run(config, worker_name):
         try:
             error, result = voltdb_helper.get_voltdb_status(worker_store)
             if error:
-                if not worker_store.time_last_error:
-                    worker_store.time_last_error = datetime.datetime.now()
-                worker_store.last_error = result
-                worker_store.has_error = True
-                print(utils.format_error_message(worker_store.worker_name,
-                                                 worker_store.time_last_error,
-                                                 worker_store.last_error))
-                voltdb_helper.process_error(slack_store, worker_store)
+                slack_helper.process_error(slack_store, worker_store, result)
             else:
                 print("")
                 msg = ""

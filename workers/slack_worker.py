@@ -116,9 +116,9 @@ def handle_command(slack_store, worker_store, userid, command, channel_name):
 def do(helper_func, slack_store, worker_store, userid, command, channel_name):
     error, result = helper_func(worker_store)
     if error:
-        msg = utils.format_error_message(worker_store.worker_name,
-                                         datetime.datetime.now(),
-                                         result)
+        msg = slack_helper.format_error_message(worker_store.worker_name,
+                                                datetime.datetime.now(),
+                                                result)
         print(msg)
         slack_helper.send_message(slack_store, msg, worker_store.worker_name)
     else:

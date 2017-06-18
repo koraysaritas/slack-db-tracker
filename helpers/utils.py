@@ -19,12 +19,6 @@ def seconds_ago_to_slang(seconds):
     return now.add(seconds=(seconds * -1)).slang_time()
 
 
-def format_error_message(worker_name, time_last_error, last_error):
-    header = "{worker_name}@{time}".format(worker_name=worker_name,
-                                           time=time_to_str(time_last_error))
-    return "\n".join([header, last_error])
-
-
 def seconds_since_last_notification(worker_store):
     return 0 if not worker_store.time_last_notification else (
         datetime.datetime.now() - worker_store.time_last_notification).total_seconds()

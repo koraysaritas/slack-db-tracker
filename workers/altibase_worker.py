@@ -1,12 +1,9 @@
-import datetime
 import time
-import os
 
 from slackclient import SlackClient
 
-from helpers import slack_helper
-from helpers import utils
 from helpers import altibase_helper
+from helpers import slack_helper
 from helpers.store import SlackStore
 from helpers.store import WorkerStore
 
@@ -35,14 +32,7 @@ def run(config, worker_name):
         try:
             error, result = altibase_helper.get_altibase_status(worker_store)
             if error:
-                if not worker_store.time_last_error:
-                    worker_store.time_last_error = datetime.datetime.now()
-                worker_store.last_error = "\n".join(result) if isinstance(result, list) else result
-                worker_store.has_error = True
-                print(utils.format_error_message(worker_store.worker_name,
-                                                 worker_store.time_last_error,
-                                                 worker_store.last_error))
-                altibase_helper.process_error(slack_store, worker_store)
+                slack_helper.process_error(slack_store, worker_store, result)
             else:
                 print("")
                 msg = ""
