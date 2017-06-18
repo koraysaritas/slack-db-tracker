@@ -10,6 +10,8 @@ def get_voltdb_status(worker_store):
         c1 = 'echo "exec @SystemInformation OVERVIEW;"'
         # c2 = 'sqlcmd' # requires: export PATH=$PATH:$HOME/voltdb/voltdb-ent-7.0/bin
         c2 = config_helper.path_join(worker_store.bin_dir, worker_store.bin_isql)
+        if len(worker_store.conn_str) > 0:
+            c2 = "{isql} {conn_str}".format(isql=c2, conn_str=worker_store.conn_str)
         if worker_store.verbose:
             print("")
             print(" | ".join([c1, c2]))
