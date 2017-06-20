@@ -24,7 +24,19 @@ def get_altibase_status(worker_store):
         stdout, stderr = p1.communicate()
 
         if p1.returncode != 0:
-            err = re.sub(' +', ' ', stderr.decode("utf-8"))
+            out = stdout.decode("utf-8")
+            err = stderr.decode("utf-8")
+            if worker_store.verbose:
+                print("\np1.returncode != 0")
+                print("out: {}\nerr:{}".format(out, err))
+            lines = [line.decode() for line in stdout.splitlines()]
+            i = 0
+            while i < len(lines) and not lines[i].startswith("ISQL"):
+                i += 1
+            if i + 1 < len(lines):
+                err = "{}\n{}".format(lines[i], lines[i + 1])
+                if worker_store.verbose:
+                    print("err parsed: {}\n".format(err))
             return True, err
         else:
             result = ["{0}: {1}".format("Hostname", worker_store.hostname)]
