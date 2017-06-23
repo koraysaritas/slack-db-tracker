@@ -69,10 +69,22 @@ Make some or all of the following settings depending on your setup:
 ## Screenshots
 
 ###### Commands-1
-![01](https://github.com/koraysaritas/slack-db-tracker/blob/master/screenshots/01_small.png)
+<img
+  src="/screenshots/01.png"
+  alt="01"
+  width="500"
+/>
 
 ###### Commands-2
-![03](https://github.com/koraysaritas/slack-db-tracker/blob/master/screenshots/03_small.PNG)
+<img
+  src="/screenshots/03.png"
+  alt="01"
+  width="500"
+/>
 
 ###### Notifications
-![02](https://github.com/koraysaritas/slack-db-tracker/blob/master/screenshots/02_small.PNG)
+<img
+  src="/screenshots/02.png"
+  alt="01"
+  width="500"
+/>
