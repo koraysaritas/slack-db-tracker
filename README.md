@@ -78,13 +78,20 @@ Make some or all of the following settings depending on your setup:
 ###### Commands-2
 <img
   src="/screenshots/03.png"
-  alt="01"
+  alt="03"
   width="500"
 />
 
 ###### Notifications
 <img
   src="/screenshots/02.png"
-  alt="01"
+  alt="02"
+  width="500"
+/>
+
+###### Memory usage
+<img
+  src="/screenshots/04.png"
+  alt="04"
   width="500"
 />
