@@ -5,3 +5,4 @@ from . import slack_helper
 from . import voltdb_helper
 from . import timesten_helper
 from . import altibase_helper
+from . import resource_helper

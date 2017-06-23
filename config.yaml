@@ -13,7 +13,8 @@ slack:
     # command: worker
     altibase-status: 'altibase',
     timesten-status: 'timesten',
-    voltdb-status: 'voltdb'
+    voltdb-status: 'voltdb',
+    memusage: 'resource'
   }
   seconds-sleep-after-slack-poll: 2
 altibase:
@@ -61,3 +62,9 @@ voltdb:
       'Uptime': ['Uptime', '.*UPTIME\s+(.*)\s{2,}']
     }
   }
+resource:
+  notify-memory-usage: true
+  notify-cpu-usage: false
+  notify-disk-usage: false
+  seconds-sleep-after-run : 5
+  seconds-error-msg-flood-protection: 300

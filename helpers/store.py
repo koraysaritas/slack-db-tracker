@@ -9,7 +9,7 @@ class Store:
 class WorkerStore(Store):
     def __init__(self, config, worker_name):
         Store.__init__(self, config)
-        self.is_active = config[worker_name]["bin-dir"]
+        self.is_active = config[worker_name]["is-active"]
         self.worker_name = worker_name
         self.bin_dir = config[worker_name]["bin-dir"]
         self.bin_isql = config[worker_name]["bin-isql"]
@@ -46,3 +46,28 @@ class SlackStore(Store):
                               for command, worker_name in dict(config["slack"]["commands"]).items()}
         self.dict_commands_raw = config["slack"]["commands"]
         self.seconds_sleep_after_slack_poll = int(config["slack"]["seconds-sleep-after-slack-poll"])
+
+
+class ResourceStore(Store):
+    def __init__(self, config):
+        Store.__init__(self, config)
+        self.seconds_sleep_after_run = int(config["resource"]["seconds-sleep-after-run"])
+        self.seconds_error_msg_flood_protection = config["resource"]["seconds-error-msg-flood-protection"]
+        self.notify_memory_usage = config["resource"]["notify-memory-usage"]
+        self.notify_cpu_usage = config["resource"]["notify-cpu-usage"]
+        self.notify_disk_usage = config["resource"]["notify-disk-usage"]
+        self.mem_percents_logspaced = None
+        self.mem_last_percent = None
+        self.mem_threshold_next_percent = None
+        self.mem_time_last_notification = None
+        self.mem_time_last_run = None
+        self.cpu_last_percent = None
+        self.cpu_percents_ring_buffer = None
+        self.cpu_time_last_notification = None
+        self.cpu_time_last_run = None
+        self.disk_percents_logspaced = None
+        self.disk_last_percent = None
+        self.disk_threshold_next_percent = None
+        self.disk_time_last_notification = None
+        self.disk_time_last_run = None
+

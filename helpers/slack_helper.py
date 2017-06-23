@@ -33,6 +33,11 @@ def send_message(slack_store, message, worker_name):
             worker_name, response.status_code, response.text, message))
 
 
+def send_wait_message(slack_store, worker_name, userid):
+    msg = "{mention_text} Ok wait a second."
+    send_message_to_user(slack_store, msg, worker_name, userid)
+
+
 def get_channel_id(slack_store, slack_channel_name):
     if slack_channel_name in slack_store.dict_slack_channels:
         return slack_store.dict_slack_channels[slack_channel_name]
@@ -111,7 +116,7 @@ def process_error(slack_store, worker_store, error_result):
         if worker_store.verbose:
             print("\n" + err_msg)
 
-        seconds_since_last_notification = utils.seconds_since_last_notification(worker_store)
+        seconds_since_last_notification = utils.seconds_since_last_notification(worker_store.time_last_notification)
         if worker_store.verbose:
             print("seconds_since_last_notification: " + str(seconds_since_last_notification))
 

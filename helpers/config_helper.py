@@ -19,6 +19,24 @@ def is_worker_active(config, worker_name):
         return False
 
 
+def is_resource_notification_active(config, resource_type):
+    try:
+        if resource_type == "memusage":
+            return config["resource"]["notify-memory-usage"]
+    except KeyError:
+        pass
+    return False
+
+
+def any_resource_notification_active(config):
+    try:
+        return any([config["resource"]["notify-memory-usage"],
+                    config["resource"]["notify-cpu-usage"],
+                    config["resource"]["notify-disk-usage"]])
+    except KeyError:
+        return False
+
+
 def get_config(debug=False):
     print("Reading config.")
     config_path = os.path.join(Path().resolve(), "config-dev.yaml" if debug else "config.yaml")

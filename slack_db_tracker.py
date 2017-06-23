@@ -5,6 +5,7 @@ import click
 from helpers import config_helper
 from workers import db_worker
 from workers import slack_worker
+from workers import resource_worker
 
 
 def create_worker(workers, worker_name, worker_func, worker_args):
@@ -24,9 +25,10 @@ def main(debug, verbose):
     click.echo('Verbosity: %s' % verbose)
     config = config_helper.get_config(debug=debug)
 
+    queue_resource = multiprocessing.Queue()
     workers = []
 
-    create_worker(workers, "slack_worker", slack_worker.run, (config, "slack", verbose))
+    create_worker(workers, "slack_worker", slack_worker.run, (config, "slack", verbose, queue_resource))
 
     if config_helper.is_worker_active(config, "voltdb"):
         create_worker(workers, "voltdb_worker", db_worker.run, (config, "voltdb", verbose))
@@ -36,6 +38,9 @@ def main(debug, verbose):
 
     if config_helper.is_worker_active(config, "altibase"):
         create_worker(workers, "altibase_worker", db_worker.run, (config, "altibase", verbose))
+
+    if config_helper.any_resource_notification_active(config):
+        create_worker(workers, "resource_worker", resource_worker.run, (config, "resource", verbose, queue_resource))
 
     for w in workers:
         print('Starting worker for {}.'.format(w.name))

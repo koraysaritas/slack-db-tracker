@@ -13,7 +13,7 @@ from helpers.store import SlackStore
 from helpers.store import WorkerStore
 
 
-def run(config, worker_name, verbose):
+def run(config, worker_name, verbose, queue_resource):
     slack_store = SlackStore(config)
     slack_store.verbose = verbose
 
@@ -37,12 +37,24 @@ def run(config, worker_name, verbose):
                         if channel_name and userid:
                             if slack_store.verbose:
                                 print("Channel: {}, Maybe Command: {}".format(channel_name, maybe_command))
+
                             yes_handle, worker_store = should_handle_command(slack_store, dict_workers, userid,
                                                                              channel_name, maybe_command)
                             if yes_handle:
-                                slack_helper.send_message_to_user(slack_store,
-                                                                  "{mention_text} Ok wait a second.", "slack", userid)
+                                slack_helper.send_wait_message(slack_store, "slack", userid)
                                 handle_command(slack_store, worker_store, userid, maybe_command, channel_name)
+
+                            yes_request = False
+                            if not yes_handle:
+                                yes_request, queue_message = should_request_command(config, slack_store, maybe_command)
+                                if yes_request:
+                                    slack_helper.send_wait_message(slack_store, "slack", userid)
+                                    make_queue_request(slack_store, queue_resource, queue_message, userid)
+
+                            if not any([yes_handle, yes_request]) and slack_store.slack_send_help_msg:
+                                message = "{mention_text} not sure what you mean.\nCommands:\n" + \
+                                          slack_helper.get_avail_command_str(slack_store)
+                                slack_helper.send_message_to_user(slack_store, message, "slack", userid)
                     except Exception as e:
                         ex = "Exception: {} @slack_client.rtm_read: {}".format(worker_name, e)
                         print(ex)
@@ -95,10 +107,6 @@ def should_handle_command(slack_store, dict_workers, userid, channel_name, maybe
                 return True, dict_workers[command_worker_name]
         else:
             pass  # worker config does not exist in the current instance
-    elif slack_store.slack_send_help_msg:
-        message = "{mention_text} not sure what you mean.\nCommands:\n" + \
-                  slack_helper.get_avail_command_str(slack_store)
-        slack_helper.send_message_to_user(slack_store, message, "slack", userid)
     return False, None
 
 
@@ -133,3 +141,16 @@ def do(helper_func, slack_store, worker_store, userid, command, channel_name):
         if slack_store.verbose:
             print("\n" + msg)
         slack_helper.send_message(slack_store, msg, worker_store.worker_name)
+
+
+def should_request_command(config, slack_store, queue_message):
+    if queue_message in slack_store.dict_commands:
+        maybe_resource = slack_store.dict_commands[queue_message]
+        queue_message = utils.command_without_hostname(slack_store.hostname, queue_message)
+        if maybe_resource == "resource" and config_helper.is_resource_notification_active(config, queue_message):
+            return True, queue_message
+    return False, None
+
+
+def make_queue_request(slack_store, queue_resource, queue_message, userid):
+    queue_resource.put((queue_message, userid))
