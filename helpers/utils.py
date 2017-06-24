@@ -55,3 +55,18 @@ def should_send_resources_message(resource_store, resource_type):
                        int(resource_store.seconds_error_msg_flood_protection))
         return not resource_store.disk_time_last_notification or long_enough
     return False
+
+
+# https://github.com/GoogleCloudPlatform/python-compat-runtime/blob/master/appengine-compat/exported_appengine_sdk/google/appengine/tools/devappserver2/admin/admin_request_handler.py
+def byte_size_format(value):
+    byte_count = int(value)
+    if byte_count == 1:
+        return '1 Byte'
+    elif byte_count < 1024:
+        return '%d Bytes' % byte_count
+    elif byte_count < 1024 ** 2:
+        return '%.1f KiB (%d Bytes)' % (byte_count / 1024.0, byte_count)
+    elif byte_count < 1024 ** 3:
+        return '%.1f MiB (%d Bytes)' % (byte_count / 1024.0 ** 2, byte_count)
+    else:
+        return '%.1f GiB (%d Bytes)' % (byte_count / 1024.0 ** 3, byte_count)

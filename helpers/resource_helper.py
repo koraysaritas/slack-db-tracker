@@ -36,9 +36,14 @@ def current_cpu_percent(resource_store):
 
 def current_disk_percent(resource_store, filter_by_threshold=False):
     # physical devices only
-    dfkh = [(dp.device, dp.mountpoint, disk_usage(dp.mountpoint).percent) for dp in disk_partitions(all=False)]
+    dfkh = []
+    for dp in disk_partitions(all=False):
+        du = disk_usage(dp.mountpoint)
+        dfkh.append((dp.device, dp.mountpoint, du.percent, du.total, du.used, du.free))
+
     if filter_by_threshold:
         dfkh = [df for df in dfkh if df[2] > resource_store.disk_usage_percent_threshold]
+
     return dfkh if len(dfkh) > 0 else None
 
 
@@ -125,11 +130,16 @@ def to_friendly_disk_notification_message(resource_store, dfkh):
                                 str(resource_store.disk_usage_percent_threshold)),
                             ])
         msg.extend(["~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"])
-        for device, mountpoint, disk_percent in dfkh:
-            msg.extend(["{}\nDevice: {}\nMount Point: {}\nUsed: %{}".format(resource_store.hostname,
-                                                                            device,
-                                                                            mountpoint,
-                                                                            "%#04.1f" % disk_percent)])
+        for device, mountpoint, disk_percent, total, used, free in dfkh:
+            msg.extend(["{}\nDevice: {}\nMount Point: {}\nUsed: %{}\nTotal: {}\nUsed: {}\nFree: {}".format(
+                resource_store.hostname,
+                device,
+                mountpoint,
+                "%#04.1f" % disk_percent,
+                utils.byte_size_format(total),
+                utils.byte_size_format(used),
+                utils.byte_size_format(free)
+            )])
             msg.extend(["~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"])
 
         msg = "\n".join([header,
