@@ -57,7 +57,7 @@ def process_cpu_ring_buffer(resource_store):
         num_above_threshold = sum(prcnt >= resource_store.cpu_usage_percent_threshold
                                   for prcnt, _ in resource_store.cpu_circular_buffer[t])
 
-        if num_above_threshold > resource_store.cpu_notification_threshold_count:
+        if num_above_threshold >= resource_store.cpu_notification_threshold_count:
             should_notify_cpu_usage = True
             cpu_gone_wild.append((t, copy(resource_store.cpu_circular_buffer[t])))
 

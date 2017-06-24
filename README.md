@@ -82,16 +82,23 @@ Make some or all of the following settings depending on your setup:
   width="500"
 />
 
-###### Notifications
+###### Commands-3
+<img
+  src="/screenshots/06.png"
+  alt="06"
+  width="500"
+/>
+
+###### Notifications-1
 <img
   src="/screenshots/02.png"
   alt="02"
   width="500"
 />
 
-###### Memory usage
+###### Notifications-2
 <img
-  src="/screenshots/04.png"
-  alt="04"
+  src="/screenshots/05.png"
+  alt="05"
   width="500"
 />
