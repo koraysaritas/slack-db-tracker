@@ -71,8 +71,6 @@ class ResourceStore(Store):
         self.cpu_circular_buffer = None
         self.cpu_circular_buffer_maxlen = config["resource"]["cpu-circular-buffer-maxlen"]
         self.cpu_notification_threshold_count = config["resource"]["cpu-notification-threshold-count"]
-        self.disk_percents_logspaced = None
-        self.disk_last_percent = None
-        self.disk_threshold_next_percent = None
+        self.disk_usage_percent_threshold = config["resource"]["disk-usage-percent-threshold"]
         self.disk_time_last_notification = None
         self.disk_time_last_run = None

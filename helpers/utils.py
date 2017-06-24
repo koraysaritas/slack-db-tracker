@@ -46,8 +46,12 @@ def should_send_resources_message(resource_store, resource_type):
         long_enough = (seconds_since_last_notification(resource_store.mem_time_last_notification) >
                        int(resource_store.seconds_error_msg_flood_protection))
         return not resource_store.mem_time_last_notification or long_enough
-    if resource_type == "cpuusage":
+    elif resource_type == "cpuusage":
         long_enough = (seconds_since_last_notification(resource_store.cpu_time_last_notification) >
                        int(resource_store.seconds_error_msg_flood_protection))
         return not resource_store.cpu_time_last_notification or long_enough
+    elif resource_type == "diskusage":
+        long_enough = (seconds_since_last_notification(resource_store.disk_time_last_notification) >
+                       int(resource_store.seconds_error_msg_flood_protection))
+        return not resource_store.disk_time_last_notification or long_enough
     return False

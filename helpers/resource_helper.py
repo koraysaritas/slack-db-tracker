@@ -3,7 +3,7 @@ import datetime
 from copy import copy
 
 from numpy import logspace, log10, where
-from psutil import virtual_memory, cpu_percent, cpu_count
+from psutil import virtual_memory, cpu_percent, disk_partitions, disk_usage
 
 from helpers import slack_helper
 from helpers import utils
@@ -34,12 +34,15 @@ def current_cpu_percent(resource_store):
     return cpu_percent(interval=1, percpu=True)
 
 
-def cpu_save_current_usage(resource_store, current_cpu_usage, cpu_time_last_run_utc):
-    if not resource_store.cpu_circular_buffer:
-        resource_store.logical_cpu_count = cpu_count(logical=True)
-        resource_store.cpu_circular_buffer = [collections.deque(maxlen=resource_store.cpu_circular_buffer_maxlen)
-                                              for _ in range(resource_store.logical_cpu_count)]
+def current_disk_percent(resource_store, filter_by_threshold=False):
+    # physical devices only
+    dfkh = [(dp.device, dp.mountpoint, disk_usage(dp.mountpoint).percent) for dp in disk_partitions(all=False)]
+    if filter_by_threshold:
+        dfkh = [df for df in dfkh if df[2] > resource_store.disk_usage_percent_threshold]
+    return dfkh if len(dfkh) > 0 else None
 
+
+def cpu_save_current_usage(resource_store, current_cpu_usage, cpu_time_last_run_utc):
     try:
         for t in range(resource_store.logical_cpu_count):
             resource_store.cpu_circular_buffer[t].append((current_cpu_usage[t], cpu_time_last_run_utc))
@@ -80,9 +83,10 @@ def to_friendly_cpu_notification_message(resource_store, id_and_buff):
                             ])
         msg.extend(["~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"])
         for cpu_id, ring_buffer in id_and_buff:
-            msg.extend(["Core #{}\t%{}\t@{}".format("%#02d" % (cpu_id + 1),
-                                                    "%#04.1f" % percent,
-                                                    utils.datetime_to_slang(timestamp))
+            msg.extend(["{} Core #{}\t%{}\t@{}".format(resource_store.hostname,
+                                                       "%#02d" % (cpu_id + 1),
+                                                       "%#04.1f" % percent,
+                                                       utils.datetime_to_slang(timestamp))
                         for percent, timestamp in ring_buffer])
             msg.extend(["~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"])
 
@@ -90,7 +94,8 @@ def to_friendly_cpu_notification_message(resource_store, id_and_buff):
                          "\n".join(m for m in msg)])
         return msg
     except Exception as e:
-        ex = "Sorry, I've failed :(\n{}".format(e)
+        ex = "Sorry, I've failed @to_friendly_cpu_notification_message\n{}".format(e)
+        print(ex)
         return ex
 
 
@@ -102,7 +107,7 @@ def next_threshold(percents_logspaced, current):
         return current
 
 
-def str_current_mem_usage(resource_store):
+def to_friendly_mem_notification_message(resource_store):
     msg = "\n".join(["{hostname} @{time_last_measure}".format(hostname=resource_store.hostname,
                                                               time_last_measure=utils.time_to_str(
                                                                   resource_store.mem_time_last_run)),
@@ -112,15 +117,31 @@ def str_current_mem_usage(resource_store):
     return msg
 
 
-def send_current_mem_usage(slack_store, resource_store, userid):
-    msg_current_mem_usage = str_current_mem_usage(resource_store)
-    if userid:
-        slack_helper.send_message_to_user(slack_store, msg_current_mem_usage, "resource", userid)
-    else:
-        slack_helper.send_message(slack_store, msg_current_mem_usage, "resource")
+def to_friendly_disk_notification_message(resource_store, dfkh):
+    try:
+        msg = []
+        header = "\n".join(["{} @{}".format(resource_store.hostname, utils.time_to_str(datetime.datetime.now())),
+                            "Disk usage threshold percent: %{}".format(
+                                str(resource_store.disk_usage_percent_threshold)),
+                            ])
+        msg.extend(["~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"])
+        for device, mountpoint, disk_percent in dfkh:
+            msg.extend(["{} Device: {}\tMount Point: {}\tUsed: %{}".format(resource_store.hostname,
+                                                                           device,
+                                                                           mountpoint,
+                                                                           "%#04.1f" % disk_percent)])
+            msg.extend(["~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"])
+
+        msg = "\n".join([header,
+                         "\n".join(m for m in msg)])
+        return msg
+    except Exception as e:
+        ex = "Sorry, I've failed @to_friendly_disk_notification_message\n{}".format(e)
+        print(ex)
+        return ex
 
 
-def send_cpu_usage(slack_store, friendly_message, userid):
+def send_friendly_message(slack_store, friendly_message, userid):
     if userid:
         slack_helper.send_message_to_user(slack_store, friendly_message, "resource", userid)
     else:
