@@ -7,6 +7,11 @@ Send database events and notifications into Slack.
 - TimesTen
 - Altibase
 
+##### Supported System and Process Utilities
+- Memory usage
+- CPU usage
+- Disk usage
+
 ## Prerequisites
 
 - Git (1.7.x or newer)
@@ -36,7 +41,6 @@ You need to set up these Slack and database related configs at the config.yaml f
 - ``hostname: '<HOSTNAME-HERE>'``
   - Example: ``hostname: 'omsdev'``
 - ``supported-databases: ['altibase', 'timesten', 'voltdb']``
-  - You can delete the unused items
   - Example ``supported-databases: ['timesten']``
 - ``token: '<SLACK-TOKEN-HERE>'``
   - Example: ``token: 'xoxb-15...'``
@@ -72,20 +76,27 @@ Make some or all of the following settings depending on your setup:
 <img
   src="/screenshots/01.png"
   alt="01"
-  width="500"
+  width="350"
 />
 
 ###### Commands-2
 <img
   src="/screenshots/03.png"
   alt="03"
-  width="500"
+  width="300"
 />
 
 ###### Commands-3
 <img
   src="/screenshots/06.png"
   alt="06"
+  width="300"
+/>
+
+###### Commands-4
+<img
+  src="/screenshots/07.png"
+  alt="07"
   width="500"
 />
 
@@ -93,12 +104,12 @@ Make some or all of the following settings depending on your setup:
 <img
   src="/screenshots/02.png"
   alt="02"
-  width="500"
+  width="350"
 />
 
 ###### Notifications-2
 <img
   src="/screenshots/05.png"
   alt="05"
-  width="500"
+  width="350"
 />
