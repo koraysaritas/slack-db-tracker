@@ -126,10 +126,10 @@ def to_friendly_disk_notification_message(resource_store, dfkh):
                             ])
         msg.extend(["~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"])
         for device, mountpoint, disk_percent in dfkh:
-            msg.extend(["{} Device: {}\tMount Point: {}\tUsed: %{}".format(resource_store.hostname,
-                                                                           device,
-                                                                           mountpoint,
-                                                                           "%#04.1f" % disk_percent)])
+            msg.extend(["{}\nDevice: {}\nMount Point: {}\nUsed: %{}".format(resource_store.hostname,
+                                                                            device,
+                                                                            mountpoint,
+                                                                            "%#04.1f" % disk_percent)])
             msg.extend(["~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"])
 
         msg = "\n".join([header,
