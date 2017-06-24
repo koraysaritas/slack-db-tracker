@@ -23,8 +23,14 @@ def is_resource_notification_active(config, resource_type):
     try:
         if resource_type == "memusage":
             return config["resource"]["notify-memory-usage"]
-    except KeyError:
-        pass
+        elif resource_type == "cpuusage":
+            return config["resource"]["notify-cpu-usage"]
+        elif resource_type == "diskusage":
+            return config["resource"]["notify-disk-usage"]
+        else:
+            return True
+    except KeyError as e:
+        print("KeyError: {} @is_resource_notification_active".format(resource_type))
     return False
 
 

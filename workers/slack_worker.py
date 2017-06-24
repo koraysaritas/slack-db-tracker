@@ -32,25 +32,32 @@ def run(config, worker_name, verbose, queue_resource):
                                                                              slack_store.slack_channel_name))
                 while True:
                     try:
+                        # read slack
                         userid, channel_name, maybe_command = parse_slack_output(slack_store,
+
                                                                                  slack_store.slack_client.rtm_read())
+
+                        # if there is a message to bot or bot's name mentioned
                         if channel_name and userid:
                             if slack_store.verbose:
                                 print("Channel: {}, Maybe Command: {}".format(channel_name, maybe_command))
 
+                            # message contains a db command
                             yes_handle, worker_store = should_handle_command(slack_store, dict_workers, userid,
                                                                              channel_name, maybe_command)
                             if yes_handle:
                                 slack_helper.send_wait_message(slack_store, "slack", userid)
                                 handle_command(slack_store, worker_store, userid, maybe_command, channel_name)
 
+                            # the message is a command but some other worker needs to process it
                             yes_request = False
                             if not yes_handle:
                                 yes_request, queue_message = should_request_command(config, slack_store, maybe_command)
                                 if yes_request:
                                     slack_helper.send_wait_message(slack_store, "slack", userid)
-                                    make_queue_request(slack_store, queue_resource, queue_message, userid)
+                                    queue_put_request(slack_store, queue_resource, queue_message, userid)
 
+                            # send user a firendly message about available commands
                             if not any([yes_handle, yes_request]) and slack_store.slack_send_help_msg:
                                 message = "{mention_text} not sure what you mean.\nCommands:\n" + \
                                           slack_helper.get_avail_command_str(slack_store)
@@ -121,11 +128,11 @@ def handle_command(slack_store, worker_store, userid, command, channel_name):
     elif cmd_parsed == "altibase-status":
         helper_func = altibase_helper.get_altibase_status
     if helper_func:
-        do(helper_func, slack_store, worker_store, userid, command, channel_name)
+        do_func(helper_func, slack_store, worker_store, userid, command, channel_name)
 
 
-def do(helper_func, slack_store, worker_store, userid, command, channel_name):
-    error, result = helper_func(worker_store)
+def do_func(func, slack_store, worker_store, userid, command, channel_name):
+    error, result = func(worker_store)
     if error:
         msg = slack_helper.format_error_message(worker_store.worker_name,
                                                 datetime.datetime.now(),
@@ -152,5 +159,5 @@ def should_request_command(config, slack_store, queue_message):
     return False, None
 
 
-def make_queue_request(slack_store, queue_resource, queue_message, userid):
+def queue_put_request(slack_store, queue_resource, queue_message, userid):
     queue_resource.put((queue_message, userid))

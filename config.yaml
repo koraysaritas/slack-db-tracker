@@ -14,7 +14,8 @@ slack:
     altibase-status: 'altibase',
     timesten-status: 'timesten',
     voltdb-status: 'voltdb',
-    memusage: 'resource'
+    memusage: 'resource',
+    cpuusage: 'resource'
   }
   seconds-sleep-after-slack-poll: 2
 altibase:
@@ -64,7 +65,10 @@ voltdb:
   }
 resource:
   notify-memory-usage: true
-  notify-cpu-usage: false
+  notify-cpu-usage: true
   notify-disk-usage: false
+  cpu-usage-percent-threshold: 60
+  cpu-circular-buffer-maxlen: 10
+  cpu-notification-threshold-count: 7
   seconds-sleep-after-run : 5
   seconds-error-msg-flood-protection: 300

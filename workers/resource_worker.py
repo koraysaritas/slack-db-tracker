@@ -42,7 +42,10 @@ def run(config, worker_name, verbose, queue_resource):
             queue_message = try_get_queue_message(queue_resource)
             if queue_message:
                 handle_queue_message(slack_store, resource_store, queue_message)
-            process_mem_usage(slack_store, resource_store)
+            if resource_store.notify_memory_usage:
+                process_mem_usage(slack_store, resource_store)
+            if resource_store.notify_cpu_usage:
+                process_cpu_usage(slack_store, resource_store)
         except Exception as e:
             ex = "Exception: {} @run: {}".format(worker_name, e)
             print(ex)
@@ -62,7 +65,16 @@ def try_get_queue_message(queue_resource):
 def handle_queue_message(slack_store, resource_store, tpl_queue_message):
     queue_message, userid = tpl_queue_message
     if queue_message == "memusage":
-        send_current_mem_usage(slack_store, resource_store, userid)
+        resource_helper.send_current_mem_usage(slack_store, resource_store, userid)
+    if queue_message == "cpuusage":
+        current_cpu_usage = resource_helper.current_cpu_percent(resource_store)
+        resource_helper.cpu_save_current_usage(resource_store, current_cpu_usage, resource_store.cpu_time_last_run_utc)
+        snapshot = resource_helper.get_cpu_ring_buffer_snapshot(resource_store)
+        friendly_message = resource_helper.to_friendly_cpu_notification_message(resource_store, snapshot)
+        if resource_store.verbose:
+            print(friendly_message)
+        resource_helper.send_cpu_usage(slack_store, friendly_message, userid)
+        snapshot = None
 
 
 def process_mem_usage(slack_store, resource_store):
@@ -75,13 +87,27 @@ def process_mem_usage(slack_store, resource_store):
                                                                                current_measure)
     if current_measure > last_thresold:
         if utils.should_send_resources_message(resource_store, "memusage"):
-            send_current_mem_usage(slack_store, resource_store, None)
+            resource_helper.send_current_mem_usage(slack_store, resource_store, userid=None)
             resource_store.mem_time_last_notification = datetime.datetime.now()
 
 
-def send_current_mem_usage(slack_store, resource_store, userid):
-    msg_current_mem_usage = resource_helper.str_current_mem_usage(resource_store)
-    if userid:
-        slack_helper.send_message_to_user(slack_store, msg_current_mem_usage, "resource", userid)
-    else:
-        slack_helper.send_message(slack_store, msg_current_mem_usage, "resource")
+def process_cpu_usage(slack_store, resource_store):
+    current_cpu_usage = resource_helper.current_cpu_percent(resource_store)
+    resource_helper.cpu_save_current_usage(resource_store, current_cpu_usage, resource_store.cpu_time_last_run_utc)
+    should_notify_cpu_usage, cpu_gone_wild = resource_helper.process_cpu_ring_buffer(resource_store)
+
+    if should_notify_cpu_usage:
+        friendly_message = resource_helper.to_friendly_cpu_notification_message(resource_store, cpu_gone_wild)
+        if resource_store.verbose:
+            print(friendly_message)
+        if utils.should_send_resources_message(resource_store, "cpuusage"):
+            resource_helper.send_cpu_usage(slack_store, friendly_message, userid=None)
+            resource_store.cpu_time_last_notification = datetime.datetime.now()
+        else:
+            if resource_store.verbose:
+                print("\ncpu_time_last_notification: " +
+                      utils.time_to_str(resource_store.cpu_time_last_notification))
+                print("seconds_since_last_notification: " +
+                      str(utils.seconds_since_last_notification(resource_store.cpu_time_last_notification)))
+
+    cpu_gone_wild = None

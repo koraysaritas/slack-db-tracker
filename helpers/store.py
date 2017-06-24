@@ -64,10 +64,15 @@ class ResourceStore(Store):
         self.cpu_last_percent = None
         self.cpu_percents_ring_buffer = None
         self.cpu_time_last_notification = None
-        self.cpu_time_last_run = None
+        self.cpu_time_last_run_local = None
+        self.cpu_time_last_run_utc = None
+        self.logical_cpu_count = None
+        self.cpu_usage_percent_threshold = config["resource"]["cpu-usage-percent-threshold"]
+        self.cpu_circular_buffer = None
+        self.cpu_circular_buffer_maxlen = config["resource"]["cpu-circular-buffer-maxlen"]
+        self.cpu_notification_threshold_count = config["resource"]["cpu-notification-threshold-count"]
         self.disk_percents_logspaced = None
         self.disk_last_percent = None
         self.disk_threshold_next_percent = None
         self.disk_time_last_notification = None
         self.disk_time_last_run = None
-
