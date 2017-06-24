@@ -74,7 +74,6 @@ def handle_queue_message(slack_store, resource_store, tpl_queue_message):
         if resource_store.verbose:
             print(friendly_message)
         resource_helper.send_cpu_usage(slack_store, friendly_message, userid)
-        snapshot = None
 
 
 def process_mem_usage(slack_store, resource_store):
@@ -109,5 +108,3 @@ def process_cpu_usage(slack_store, resource_store):
                       utils.time_to_str(resource_store.cpu_time_last_notification))
                 print("seconds_since_last_notification: " +
                       str(utils.seconds_since_last_notification(resource_store.cpu_time_last_notification)))
-
-    cpu_gone_wild = None

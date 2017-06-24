@@ -1,12 +1,16 @@
-import time
 import datetime
-import re
 import json
+
 import requests
-from slackclient import SlackClient
+
 from . import utils
 
 
+# from memory_profiler import profile
+# python -m memory_profiler slack_db_tracker.py -d -v
+
+
+# @profile
 def send_message_to_user(slack_store, message, worker_name, userid):
     if userid in slack_store.dict_slack_userid_username:
         username = slack_store.dict_slack_userid_username[userid]
@@ -16,16 +20,17 @@ def send_message_to_user(slack_store, message, worker_name, userid):
         send_message(slack_store, response, worker_name)
 
 
+# @profile
 def send_message(slack_store, message, worker_name):
-    header = slack_store.request_header
     payload = json.dumps({'text': message})
 
     if slack_store.verbose:
         print('\nRequest to slack from {}.\nMessage: {}'.format(worker_name, message))
 
     response = requests.post(
-        slack_store.slack_url_webhook, data=payload,
-        headers=header
+        slack_store.slack_url_webhook,
+        headers=slack_store.request_header,
+        data=payload
     )
 
     if response.status_code != 200:
@@ -33,6 +38,7 @@ def send_message(slack_store, message, worker_name):
             worker_name, response.status_code, response.text, message))
 
 
+# @profile
 def send_wait_message(slack_store, worker_name, userid):
     msg = "{mention_text} Ok wait a second."
     send_message_to_user(slack_store, msg, worker_name, userid)

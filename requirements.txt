@@ -2,6 +2,7 @@ click==6.7
 dateparser==0.6.0
 humanize==0.5.1
 maya==0.3.2
+memory-profiler==0.47
 numpy==1.13.0
 pendulum==1.2.2
 psutil==5.2.2

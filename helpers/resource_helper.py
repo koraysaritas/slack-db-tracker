@@ -1,9 +1,8 @@
 import collections
 import datetime
-import itertools
 from copy import copy
 
-import numpy as np
+from numpy import logspace, log10, where
 from psutil import virtual_memory, cpu_percent, cpu_count
 
 from helpers import slack_helper
@@ -13,14 +12,14 @@ from helpers import utils
 def mem_percents_logspaced(start_percent=None, end_percent=90, bins_count=30):
     if not start_percent:
         start_percent = virtual_memory().percent + 1
-    logspaced = np.logspace(np.log10(start_percent), np.log10(end_percent), bins_count)
+    logspaced = logspace(log10(start_percent), log10(end_percent), bins_count)
     return logspaced
 
 
 def disk_percents_logspaced(start_percent=None, end_percent=90, bins_count=30):
     if not start_percent:
         start_percent = virtual_memory().percent
-    logspaced = np.logspace(np.log10(start_percent), np.log10(end_percent), bins_count)
+    logspaced = logspace(log10(start_percent), log10(end_percent), bins_count)
     return logspaced
 
 
@@ -96,7 +95,7 @@ def to_friendly_cpu_notification_message(resource_store, id_and_buff):
 
 
 def next_threshold(percents_logspaced, current):
-    greater_values = percents_logspaced[np.where(percents_logspaced > current)]
+    greater_values = percents_logspaced[where(percents_logspaced > current)]
     try:
         return round(greater_values[0], 2)
     except:
