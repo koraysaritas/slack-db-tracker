@@ -86,14 +86,14 @@ def to_friendly_cpu_notification_message(resource_store, id_and_buff):
                             "Num. occurrences to trigger a notification: {}".format(
                                 str(resource_store.cpu_notification_threshold_count))
                             ])
-        msg.extend(["~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"])
+        msg.extend(["~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"])
         for cpu_id, ring_buffer in id_and_buff:
             msg.extend(["{} Core #{}\t%{}\t@{}".format(resource_store.hostname,
                                                        "%#02d" % (cpu_id + 1),
                                                        "%#04.1f" % percent,
                                                        utils.datetime_to_slang(timestamp))
                         for percent, timestamp in ring_buffer])
-            msg.extend(["~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"])
+            msg.extend(["~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"])
 
         msg = "\n".join([header,
                          "\n".join(m for m in msg)])
@@ -129,7 +129,7 @@ def to_friendly_disk_notification_message(resource_store, dfkh):
                             "Disk usage threshold percent: %{}".format(
                                 str(resource_store.disk_usage_percent_threshold)),
                             ])
-        msg.extend(["~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"])
+        msg.extend(["~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"])
         for device, mountpoint, disk_percent, total, used, free in dfkh:
             msg.extend(["{}\nDevice: {}\nMount Point: {}\nUsed: %{}\nTotal: {}\nUsed: {}\nFree: {}".format(
                 resource_store.hostname,
@@ -140,7 +140,7 @@ def to_friendly_disk_notification_message(resource_store, dfkh):
                 utils.byte_size_format(used),
                 utils.byte_size_format(free)
             )])
-            msg.extend(["~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"])
+            msg.extend(["~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"])
 
         msg = "\n".join([header,
                          "\n".join(m for m in msg)])
