@@ -57,7 +57,7 @@ def run(config, worker_name, verbose, queue_resource):
                                     slack_helper.send_wait_message(slack_store, "slack", userid)
                                     queue_put_request(slack_store, queue_resource, queue_message, userid)
 
-                            # send user a firendly message about available commands
+                            # send user a friendly message about available commands
                             if not any([yes_handle, yes_request]) and slack_store.slack_send_help_msg:
                                 message = "{mention_text} not sure what you mean.\nCommands:\n" + \
                                           slack_helper.get_avail_command_str(slack_store)
