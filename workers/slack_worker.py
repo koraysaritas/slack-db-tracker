@@ -33,18 +33,21 @@ def run(config, worker_name, verbose, queue_resource):
                 while True:
                     try:
                         # read slack
-                        userid, channel_name, maybe_command = parse_slack_output(slack_store,
-
-                                                                                 slack_store.slack_client.rtm_read())
+                        userid, channel_name, has_my_hostname, target_hostname, maybe_command = parse_slack_output(
+                            slack_store,
+                            slack_store.slack_client.rtm_read())
 
                         # if there is a message to bot or bot's name mentioned
                         if channel_name and userid:
                             if slack_store.verbose:
-                                print("Channel: {}, Maybe Command: {}".format(channel_name, maybe_command))
+                                print("Channel: {}, HasMyHostname: {} Maybe Command: {}".format(channel_name,
+                                                                                                has_my_hostname,
+                                                                                                maybe_command))
 
                             # message contains a db command
                             yes_handle, worker_store = should_handle_command(slack_store, dict_workers, userid,
-                                                                             channel_name, maybe_command)
+                                                                             channel_name, has_my_hostname,
+                                                                             maybe_command)
                             if yes_handle:
                                 slack_helper.send_wait_message(slack_store, "slack", userid)
                                 handle_command(slack_store, worker_store, userid, maybe_command, channel_name)
@@ -52,13 +55,16 @@ def run(config, worker_name, verbose, queue_resource):
                             # the message is a command but some other worker needs to process it
                             yes_request = False
                             if not yes_handle:
-                                yes_request, queue_message = should_request_command(config, slack_store, maybe_command)
+                                yes_request, queue_message = should_request_command(config, slack_store,
+                                                                                    has_my_hostname, maybe_command)
                                 if yes_request:
                                     slack_helper.send_wait_message(slack_store, "slack", userid)
                                     queue_put_request(slack_store, queue_resource, queue_message, userid)
 
                             # send user a friendly message about available commands
-                            if not any([yes_handle, yes_request]) and slack_store.slack_send_help_msg:
+                            if not any([yes_handle, yes_request]) \
+                                    and not is_valid_command(slack_store, maybe_command) \
+                                    and slack_store.slack_send_help_msg:
                                 message = "{mention_text} not sure what you mean.\nCommands:\n" + \
                                           slack_helper.get_avail_command_str(slack_store)
                                 slack_helper.send_message_to_user(slack_store, message, "slack", userid)
@@ -79,6 +85,8 @@ def run(config, worker_name, verbose, queue_resource):
 
 def parse_slack_output(slack_store, slack_rtm_output):
     output_list = slack_rtm_output
+    has_my_hostname = False
+    target_hostname = None
     if output_list and len(output_list) > 0:
         for output in output_list:
             if output and 'text' in output:
@@ -87,6 +95,8 @@ def parse_slack_output(slack_store, slack_rtm_output):
                 # return text after the @ mention, whitespace removed
                 as_mention = ""
                 has_bot = slack_store.slack_mention_bot in output['text']
+                has_my_hostname = slack_store.hostname in output['text']
+                target_hostname = parse_target_hostname(output['text'])
                 if has_bot:
                     as_mention = slack_store.slack_mention_bot
                 if not has_bot and slack_store.bot_cmd_start in output['text']:
@@ -102,14 +112,30 @@ def parse_slack_output(slack_store, slack_rtm_output):
                     except Exception as e:
                         ex = "Exception @parse_slack_output: %s" % e
                         print(ex)
-                    return userid, output['channel'], output['text'].split(as_mention)[1].strip().lower()
-    return None, None, None
+                    return userid, output['channel'], has_my_hostname, target_hostname, \
+                           output['text'].split(as_mention)[
+                               1].strip().lower()
+    return None, None, None, None, None
 
 
-def should_handle_command(slack_store, dict_workers, userid, channel_name, maybe_command):
+def parse_target_hostname(output_text):
+    try:
+        # !kerata omsdev1-altibase-status
+        hostname_command = (output_text.split())[1]  # omsdev1-altibase-status
+        maybe_hostname = hostname_command.split('-')[0]  # omsdev1
+        return maybe_hostname
+    except Exception as e:
+        return None
+
+
+def is_valid_command(slack_store, maybe_command):
+    return maybe_command and maybe_command in slack_store.dict_commands
+
+
+def should_handle_command(slack_store, dict_workers, userid, channel_name, has_my_hostname, maybe_command):
     if maybe_command in slack_store.dict_commands:
         command_worker_name = slack_store.dict_commands[maybe_command]
-        if command_worker_name in dict_workers:
+        if has_my_hostname and command_worker_name in dict_workers:
             if dict_workers[command_worker_name].is_active:
                 return True, dict_workers[command_worker_name]
         else:
@@ -134,7 +160,8 @@ def handle_command(slack_store, worker_store, userid, command, channel_name):
 def do_func(func, slack_store, worker_store, userid, command, channel_name):
     error, result = func(worker_store)
     if error:
-        msg = slack_helper.format_error_message(worker_store.worker_name,
+        msg = slack_helper.format_error_message(slack_store.hostname,
+                                                worker_store.worker_name,
                                                 datetime.datetime.now(),
                                                 result)
         if slack_store.verbose:
@@ -150,8 +177,8 @@ def do_func(func, slack_store, worker_store, userid, command, channel_name):
         slack_helper.send_message(slack_store, msg, worker_store.worker_name)
 
 
-def should_request_command(config, slack_store, queue_message):
-    if queue_message in slack_store.dict_commands:
+def should_request_command(config, slack_store, has_my_hostname, queue_message):
+    if has_my_hostname and queue_message in slack_store.dict_commands:
         maybe_resource = slack_store.dict_commands[queue_message]
         queue_message = utils.command_without_hostname(slack_store.hostname, queue_message)
         if maybe_resource == "resource" and config_helper.is_resource_notification_active(config, queue_message):

@@ -1,6 +1,7 @@
 app:
   version: '1.0.0'
-  hostname: '<HOSTNAME-HERE>' # omsdev
+  hostname: '<HOSTNAME-HERE>' # 'omsdev1'
+  active-hostnames: <ACTIVE-HOSTNAMES-HERE> # ['omsdev1', 'omsdev2']
   supported-databases: ['altibase', 'timesten', 'voltdb'] # you can delete unused items
 slack:
   is-active: true

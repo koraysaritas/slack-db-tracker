@@ -40,6 +40,8 @@ You need to set up these Slack and database related configs at the config.yaml f
 
 - ``hostname: '<HOSTNAME-HERE>'``
   - Example: ``hostname: 'omsdev'``
+- ``active-hostnames: <ACTIVE-HOSTNAMES-HERE>``
+  - Example: ``active-hostnames: ['omsdev1', 'omsdev2']``  
 - ``supported-databases: ['altibase', 'timesten', 'voltdb']``
   - Example ``supported-databases: ['timesten']``
 - ``token: '<SLACK-TOKEN-HERE>'``

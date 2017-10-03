@@ -17,7 +17,7 @@ def init_stores(slack_store, resource_store):
     slack_store.slack_client = SlackClient(slack_store.slack_token)
     slack_helper.join_channel(slack_store, slack_store.slack_channel_name)
 
-    resource_store.mem_percents_logspaced = resource_helper.mem_percents_logspaced(start_percent=None,
+    resource_store.mem_percents_logspaced = resource_helper.mem_percents_logspaced(start_percent=50,
                                                                                    end_percent=90,
                                                                                    bins_count=20)
     resource_store.mem_last_percent = resource_helper.current_mem_percent(resource_store)

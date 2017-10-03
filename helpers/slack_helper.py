@@ -104,9 +104,10 @@ def get_avail_command_str(slack_store):
     return c
 
 
-def format_error_message(worker_name, time_last_error, last_error):
-    header = "{worker_name}@{time}".format(worker_name=worker_name,
-                                           time=utils.time_to_str(time_last_error))
+def format_error_message(hostname, worker_name, time_last_error, last_error):
+    header = "{hostname}-{worker_name}@{time}".format(hostname=hostname,
+                                                      worker_name=worker_name,
+                                                      time=utils.time_to_str(time_last_error))
     return "\n".join([header, last_error])
 
 
@@ -116,7 +117,8 @@ def process_error(slack_store, worker_store, error_result):
             worker_store.time_last_error = datetime.datetime.now()
         worker_store.last_error = "\n".join(error_result) if isinstance(error_result, list) else error_result
         worker_store.has_error = True
-        err_msg = format_error_message(worker_store.worker_name,
+        err_msg = format_error_message(slack_store.hostname,
+                                       worker_store.worker_name,
                                        worker_store.time_last_error,
                                        worker_store.last_error)
         if worker_store.verbose:

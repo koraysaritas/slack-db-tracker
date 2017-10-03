@@ -2,7 +2,8 @@ class Store:
     def __init__(self, config):
         self.version = config["app"]["version"]
         self.hostname = config["app"]["hostname"]
-        self.arr_supported_databases = config["app"]["hostname"]
+        self.arr_active_hostnames = config["app"]["active-hostnames"]
+        self.arr_supported_databases = config["app"]["supported-databases"]
         self.verbose = False
 
 
@@ -42,7 +43,8 @@ class SlackStore(Store):
         self.format_bot_cmd_start = "!{bot_name}"
         self.bot_cmd_start = self.format_bot_cmd_start.format(bot_name=self.slack_bot_name)
         self.format_bot_cmd = "!{bot_name} {hostname_and_command}"
-        self.dict_commands = {"-".join([self.hostname, command]): worker_name
+        self.dict_commands = {"-".join([a_hostname, command]): worker_name
+                              for a_hostname in self.arr_active_hostnames
                               for command, worker_name in dict(config["slack"]["commands"]).items()}
         self.dict_commands_raw = config["slack"]["commands"]
         self.seconds_sleep_after_slack_poll = int(config["slack"]["seconds-sleep-after-slack-poll"])
