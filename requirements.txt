@@ -6,7 +6,7 @@ humanize==0.5.1
 idna==2.8
 maya==0.6.0
 memory-profiler==0.55.0
-numpy==1.15.4
+numpy==1.22.0
 pendulum==2.0.4
 psutil==5.4.8
 python-dateutil==2.7.5
